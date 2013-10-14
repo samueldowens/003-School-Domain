@@ -1,4 +1,3 @@
-
 class Scrape
   attr_accessor :student_page
 
@@ -25,26 +24,26 @@ class Scrape
   def get_github
    ret_val = ""
    student_page.css('.social-icons a').select do |x|
-    ret_val = x.attributes["href"].value if x.attributes["href"].value.include?("github") 
+      ret_val = x.attributes["href"].value if x.attributes["href"].value.include?("github") 
     end
-    ret_val
+      ret_val
   end
 
   def get_twitter
-    ret_val = ""
-    student_page.css('.social-icons a').each do |x|
-    ret_val = x.attributes["href"].value if x.attributes["href"].value.include?("twitter") 
-    end
-    ret_val
+   ret_val = ""
+   student_page.css('.social-icons a').each do |x|
+      ret_val = x.attributes["href"].value if x.attributes["href"].value.include?("twitter") 
+   end
+      ret_val
   end
 
 
   def get_linkedin
-    ret_val = ""
-    student_page.css('.social-icons a').each do |x|
-    ret_val = x.attributes["href"].value if x.attributes["href"].value.include?("linkedin") 
-    end
-    ret_val
+   ret_val = ""
+   student_page.css('.social-icons a').each do |x|
+      ret_val = x.attributes["href"].value if x.attributes["href"].value.include?("linkedin") 
+   end
+      ret_val
   end
 
 end

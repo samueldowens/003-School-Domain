@@ -1,12 +1,8 @@
 require 'nokogiri'
 require 'open-uri'
-require 'pry'
 require_relative 'cli.rb'
 require_relative 'student.rb'
 require_relative 'scraper.rb'
-
-# Dir[File.join(File.dirname(__FILE__), "../lib", "*.rb")].each {|f| require f}
-#this runs the program.
 
 class Run
   URL = "http://students.flatironschool.com/"
@@ -30,7 +26,6 @@ class Run
       CommandLine.new
 
   end
-
 end
 
 go = Run.new

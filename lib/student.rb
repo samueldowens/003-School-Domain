@@ -1,5 +1,3 @@
-require 'pry'
-
 class Student
   attr_accessor :name, :twitter, :linkedin, :github, :website
   attr_reader :id
@@ -14,9 +12,8 @@ class Student
     @linkedin = hash[:linkedin]
     @website = hash[:website]
     @id = @@student_array.length
-     # binding.pry
 
-    clean_up_name #takes care of a couple exceptions
+    clean_up_name
   end
 
   def clean_up_name
@@ -32,7 +29,6 @@ class Student
   end
  
   def self.find(id)
-    # binding.pry
     @@student_array.select { |s| s.id == id }.first
   end
 

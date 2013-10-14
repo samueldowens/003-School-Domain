@@ -1,23 +1,20 @@
 require_relative 'student.rb'
 require_relative 'scraper.rb'
-require 'pry'
 
 class CommandLine
  
   def initialize
-    # s = Scraper.new
-    # s.call
     @on = true
     greeting
   end
  
   def on?
-      @on
+    @on
   end
  
   def browse
-      puts "Here is the index of students in the jungle."
-     Student.all.each { |student| puts "#{student.id}. #{student.name}"  }
+    puts "Here is the index of students in the jungle."
+    Student.all.each { |student| puts "#{student.id}. #{student.name}"  }
   end
  
   def show
@@ -25,7 +22,6 @@ class CommandLine
     input = gets.chomp.downcase
  
     if input.to_i > 0
-      # binding.pry
      output = Student.find(input.to_i)
     else
      output = Student.find_by_name(input)
