@@ -1,8 +1,79 @@
+<<<<<<< HEAD
 require 'spec_helper'
 require 'rspec'
+=======
+require_relative 'spec_helper'
+require 'sqlite3'
+
+describe Student do
+  context "database operations" do
+    before(:each) do
+      Student.reset_all
+      @student = Student.new.tap { |s| s.name = "Anything But Scott Oh Nevermind" }
+      # @db = DBBuddy.create
+    end
+
+    #think about what you need to do to set up a database
+    #and what should have the responsibility for doing that for these tests
+
+    describe ".insert" do
+      it "persists the student to the database" do
+        @student.should respond_to(:insert)
+        @student.insert.should eq(true)
+      end
+    end
+
+    describe ".update" do
+      it "updates the student in the database" do
+        @student.insert
+        @student.name = "Catherine"
+        @student.update.should eq(true)
+      end
+    end
+
+    describe ".save" do
+      it "chooses the right thing on first save" do
+        @student.should_receive(:insert)
+        @student.save
+      end
+      it "chooses the right thing after saving" do
+        @student.save
+        @student.name = "Steven"
+        @student.should_receive(:update)
+        @student.save
+      end
+    end
+
+    #bonus 1:  prove it!
+    describe "::load" do
+      it "loads the student from the database" do
+        @student.save
+        loaded = Student.load(@student.id)
+        loaded.name.should eq(@student.name)
+        loaded.id.should eq(@student.id)
+        @student.name = "new name"
+        @student.save
+        updated = Student.load(@student.id)
+        updated.name.should eq(@student.name)
+      end
+
+    end
+
+    #bonus 2: use before(:each) and after(:each) to create your database
+    #and set it to a default state for each test
+
+    #bonus 3: extract the code you used in bonus 2 to a
+    #new class that the test can reference to create and destroy databases
+  end
+end
+>>>>>>> c53d93e150dbfa8a5b5cfc71ab627cf1a758a97f
 
 
 describe "Student" do
+
+  before(:each) do
+    Student.reset_all
+  end
 
   it "can be instantiated" do
     Student.new.should be_an_instance_of(Student)
@@ -11,23 +82,39 @@ describe "Student" do
   describe "student properties" do
     let(:student) { Student.new }
 
-    it "has a name" do
-      student.name = "Paul"
-      student.name.should eq("Paul")
+    context 'creating a new student' do
+      it 'has properties based on an attributes hash' do
+        Student.attributes_for_db.each do |attribute|
+          student.send("#{attribute}=", "Testing #{attribute}")
+        end
+        student.save
+
+        test_student = Student.find(student.id)
+
+        Student.attributes_for_db.each do |attribute|
+          test_student.send(attribute).should eq("Testing #{attribute}")
+        end
+      end
     end
 
-    it "has social media links" do
-      student.twitter = "paulissupercool"
-      student.twitter.should eq("paulissupercool")
-      student.linkedin = "paulhateslinkedin"
-      student.linkedin.should eq("paulhateslinkedin")
-      student.facebook = "whoisthisguypaulanyway"
-      student.facebook.should eq("whoisthisguypaulanyway")
-    end
+    context 'update a student' do
+      it 'has properties based on an attributes hash' do
+        Student.attributes_for_db.each do |attribute|
+          student.send("#{attribute}=", "Original #{attribute}")
+        end
+        student.save
 
-    it "has a website" do
-      student.website = "http://websitesarecool.com"
-      student.website.should eq("http://websitesarecool.com")
+        Student.attributes_for_db.each do |attribute|
+          student.send("#{attribute}=", "Updated #{attribute}")
+        end
+        student.save
+
+        test_student = Student.find(student.id)
+
+        Student.attributes_for_db.each do |attribute|
+          test_student.send(attribute).should eq("Updated #{attribute}")
+        end
+      end
     end
   end
 
@@ -39,6 +126,7 @@ describe "Student" do
       ('a'..'c').each do |l|
         s = Student.new
         s.name = l
+        s.save
       end
 
       Student.all.count.should eq(3)
@@ -60,21 +148,6 @@ describe "Student" do
 
   end
 
-  describe "::find_by_name" do
-
-    let(:scott) { Student.new }
-    let(:avi) { Student.new }
-
-    it "can find a student by name" do
-      scott.name = "Scott"
-      avi.name = "Avi"
-
-      Student.find_by_name("Scott").first.name.should eq("Scott")
-      Student.find_by_name("Avi").first.should eq(avi)
-    end
-
-  end
-
   #BONUS ROUND! Implement an ID system
   context "with an ID" do
 
@@ -83,6 +156,7 @@ describe "Student" do
     before(:each) do
       Student.reset_all
     end
+
 
     it "has an ID" do
       student.should respond_to(:id)
@@ -94,20 +168,12 @@ describe "Student" do
 
     it "auto-assigns an id" do
       student.name = "Becky"
+      student.save
       student.id.should eq(1)
 
       s2 = Student.new
+      s2.save
       s2.id.should eq(2)
-    end
-
-    it "can find a student by ID" do
-      student.name = "Steve"
-      10.times do
-        Student.new
-      end
-
-      Student.find(student.id).name.should eq("Steve")
-      Student.find(student.id).should eq(student)
     end
 
     describe "::delete" do
@@ -124,4 +190,32 @@ describe "Student" do
 
     end
   end
+
 end
+
+describe "Student", "finders" do
+  let(:student){Student.new}
+  
+  before(:each) do
+    Student.reset_all
+  end
+
+  it 'has a finder for every attribute' do
+    Student.attributes.each do |attribute|
+      Student.should respond_to("find_by_#{attribute}")
+    end
+  end
+
+  it 'finds a student by every attribute' do
+    # create a student with every attribute value
+    Student.attributes_for_db.each do |attribute|
+      student.send("#{attribute}=", "Find #{attribute}")
+    end
+    student.save
+    
+    Student.attributes_for_db.each do |attribute|
+      Student.send("find_by_#{attribute}", "Find #{attribute}").first.should eq(student)
+    end
+  end
+end
+
